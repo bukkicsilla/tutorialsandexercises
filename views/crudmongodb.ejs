@@ -48,6 +48,32 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         &lt;&#33;--&lt;p&gt;Welcome to &lt;%= title %&gt;&lt;/p&gt;--&gt;
         </code></pre>
         
+        We have directories like routes and views, and now we create a new folder called controllers in brain folder.
+        <pre><code>
+        $ mkdir controllers
+        </code></pre>
+        In that new directory let's open a new file brain.js and define a function getParts in brain.js. We don't need the router.get function in router/index.js so we comment it out. Instead we define a new router.get function which uses the function getParts defined in brain.js. In order to use this function it should be imported, so we define a new variable brainController after the definition of var router, which imports the whole content of the brain.js file.  
+        <pre><code>
+        module.exports.getParts = function(req, res){
+          res.render('index', {title: 'Parts of the Human Brain'});
+        };
+        </code></pre>
+        <pre><code>
+        router.get('/', brainController.getParts);
+        </code></pre>
+        <pre><code>
+        var brainController = require('../controllers/brain');
+        </code></pre>
+        
+        Checking the browser, we don't see any change from last time. Finally we can save our project and subsequent verions of it in git repository. I don't go into details how to do that. One good tutorials is <a href="http://www.vogella.com/tutorials/Git/article.html" target="_blank" > here </a>. In this project we need to create a .gitignore file which contains the followings:
+        
+        <pre><code>
+        # Dependency directory
+        node_modules
+
+        # Environment variables
+        .env
+        </code></pre>
         </div>
       
     <div id="S2" class='steps'>
