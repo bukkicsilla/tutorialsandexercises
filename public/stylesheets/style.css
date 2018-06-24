@@ -1,14 +1,58 @@
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font-family: Arial;
+}
+ol {
+    padding-left: 0px;
+    //margin:0 0 0 10px;
+    //border: 1px red solid;
+}
+a, li {
+  //color: #00B7FF;
+    color: forestgreen;
 }
 
-a {
-  color: #00B7FF;
+li {
+    list-style: decimal inside;
+    //list-style: circle inside;
 }
-
-.steps{
+h2, h3{
+    font-family:fantasy;
+    //font-style: bold;
+    //font-size: 130%;
+    text-decoration-line: underline;
+}
+.step0, .steps{
     padding-left: 180px;
     padding-right: 180px;
     font-size: 24px;
+    //border: 1px darkred solid; 
+}
+.steps{
+    padding-bottom: 36px;
+}
+
+pre{
+    border: 1px forestgreen solid;
+    border-radius: 10px;
+    background-color: #c1ffca;
+    overflow: auto;
+    //white-space: pre-wrap;
+}
+
+a:link {
+    text-decoration: none;
+}
+
+a:visited {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+a:active {
+    text-decoration: underline;
 }
