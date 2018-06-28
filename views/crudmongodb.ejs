@@ -13,9 +13,9 @@
       </div>
         <div class="step0">
       <ol>
-        <li><a href="#S1"> Starting a new project with Express </a> </li>
-          <li> <a href="#S2"> Step 2 </a></li>
-          <li> <a href="#S3"> Step 3 </a></li>
+        <li class="inside"><a href="#S1"> Starting a new project with Express </a> </li>
+          <li class="inside"> <a href="#S2"> List of parts and one static part  </a></li>
+          <li class="inside"> <a href="#S3"> Step 3 </a></li>
       
       </ol>
       </div>
@@ -29,8 +29,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         $ cd brain
         $ express --ejs
         $ npm install 
-
- </code></pre>
+         </code></pre>
         
         Now we can start the project. In the project directory we use npm start or nodemon. Nodemon has the advantage that if the code has been changed, the application restarts automatically. You only have to refresh your browser. To install nodemon globally we have to use npm in terminal. After the first initial steps let's check the project in the browser: go to localhost:3000.
         
@@ -77,13 +76,67 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         </div>
       
     <div id="S2" class='steps'>
-     <span class="num"> 2. </span>
+     <h3 class="num"> 2. List of parts and one static part </h3> In views/index.ejs 
+
        
            <pre><code>
-    
+        &lt;ul&gt;
+           &lt;li&gt;Cerebrum&lt;/li&gt;
+           &lt;li&gt;Cerebellum&lt;/li&gt;
+           &lt;li&gt;Pons&lt;/li&gt;
+        &lt;/ul&gt;
+       </code></pre>
+        
+        In public/stylesheets/style.css 
+        
+  <pre><code>
+        li, p {
+            font-size: 18px;
+        }
+        
+</code></pre>
+        
+        In controllers/brain.js
+        
+        <pre><code>
+        module.exports.getPart = function(req, res){
+           res.render('part', {title: 'Part of the brain.'});
+        };
+        </code></pre>
+
+        In routes/index.js
+        <pre><code>
+        router.get('/part', brainController.getPart);
         </code></pre>
         
+        Open a new part.ejs in views
+        <pre><code>
+    &lt;!DOCTYPE html&gt;
+      &lt;html&gt;
+        &lt;head&gt;
+          &lt;title&gt;&lt;%= title %&gt;&lt;/title&gt;
+          &lt;link rel='stylesheet' href='/stylesheets/style.css' /&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+          &lt;h1&gt;&lt;%= title %&gt;&lt;/h1&gt;
+          &lt;p&gt; Cerebrum &lt;/p&gt;
+          &lt;p&gt; It means brain.&lt;/p&gt;
+          &lt;p&gt; Functionality:&lt;/p&gt;
+          &lt;ul&gt;
+            &lt;li&gt;Reasoning&lt;/li&gt;
+            &lt;li&gt;Recognition&lt;/li&gt;
+            &lt;li&gt;Visual processing&lt;/li&gt;
+            &lt;li&gt;Speech&lt;/li&gt;
+          &lt;/ul&gt;
+        &lt;/body&gt;
+      &lt;/html&gt;
+     </code></pre>
+     
+      In views/index.ejs  Instead of &lt;li&gt;Cerebrum&lt;/li&gt;
 
+      <pre><code>
+        &lt;li&gt;&lt;a href="/part"&gt;Cerebrum&lt;/a&gt;&lt;/li&gt;
+        </code></pre>
       </div>
       
 <div id="S3" class='steps'>
