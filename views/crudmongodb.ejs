@@ -51,7 +51,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         <pre><code>
         $ mkdir controllers
         </code></pre>
-        In that new directory let's open a new file brain.js and define a function getParts in brain.js. We don't need the router.get function in router/index.js so we comment it out. Instead we define a new router.get function which uses the function getParts defined in brain.js. In order to use this function it should be imported, so we define a new variable brainController after the definition of var router, which imports the whole content of the brain.js file.  
+        In that new directory let's open a new file brain.js and define a function getParts in brain.js. We don't need the router.get function in router/index.js so we comment it out. Instead we define a new router.get function which uses the function getParts defined in brain.js. In order to use this function it should be imported, so we define a new variable called brainController after the definition of var router, which imports the whole content of the brain.js file.  
         <pre><code>
         module.exports.getParts = function(req, res){
           res.render('index', {title: 'Parts of the Human Brain'});
@@ -73,12 +73,20 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         # Environment variables
         .env
         </code></pre>
+        After cloning the repository you can checkout this part. 
+        
+        <pre><code>
+   $ git clone https://github.com/bukkicsilla/brainparts.git;
+   $ cd brainparts
+   $ git checkout step1
+   $ npm install
+        </code></pre>
         </div>
       
+     
+      
     <div id="S2" class='steps'>
-     <h3 class="num"> 2. List of parts and one static part </h3> In views/index.ejs 
-
-       
+     <h3 class="num"> 2. List of parts and one static part </h3> In views/index.ejs first we creat our list with only 3 parts of the brain. Let's put this list after the line with the title. Later we can add more of the parts of the brain in form using mongodb database. 
            <pre><code>
         &lt;ul&gt;
            &lt;li&gt;Cerebrum&lt;/li&gt;
@@ -87,7 +95,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         &lt;/ul&gt;
        </code></pre>
         
-        In public/stylesheets/style.css 
+        Some styling is needed for better readability. In public/stylesheets/style.css we add: 
         
   <pre><code>
         li, p {
@@ -95,8 +103,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         }
         
 </code></pre>
-        
-        In controllers/brain.js
+        Now we would like to see some of the details of one brain area. The first part is the Cerebrum in the list, so we use that and we need a new part.ejs page for that. But before that let's define a function getPart in controllers/brain.js. The 'part' means the part.ejs file we will create soon.
         
         <pre><code>
         module.exports.getPart = function(req, res){
@@ -104,12 +111,12 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         };
         </code></pre>
 
-        In routes/index.js
+        To show the details, a route method has to be set up in routes/index.js, which uses the function getPart.
         <pre><code>
         router.get('/part', brainController.getPart);
         </code></pre>
         
-        Open a new part.ejs in views
+        Now let's create the part.ejs file in views and populate it with the following code:
         <pre><code>
     &lt;!DOCTYPE html&gt;
       &lt;html&gt;
@@ -132,10 +139,15 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
       &lt;/html&gt;
      </code></pre>
      
-      In views/index.ejs  Instead of &lt;li&gt;Cerebrum&lt;/li&gt;
+      To reach this page from the index page, we modify one line in views/index.ejs.  Instead of &lt;li&gt;Cerebrum&lt;/li&gt; we put:
 
       <pre><code>
         &lt;li&gt;&lt;a href="/part"&gt;Cerebrum&lt;/a&gt;&lt;/li&gt;
+        </code></pre>
+        
+        Let's check our project in the browser again. You can get the code by cheching out step2. The f flag makes sure that any changes will be undone. 
+        <pre><code>
+    $ git checkout -f step2
         </code></pre>
       </div>
       
