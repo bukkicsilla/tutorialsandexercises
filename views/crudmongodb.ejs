@@ -15,7 +15,7 @@
       <ol>
         <li class="inside"><a href="#S1"> Starting a new project with Express </a> </li>
           <li class="inside"> <a href="#S2"> List of parts and one static part  </a></li>
-          <li class="inside"> <a href="#S3"> Step 3 </a></li>
+          <li class="inside"> <a href="#S3"> Data in controller </a></li>
       
       </ol>
       </div>
@@ -152,13 +152,68 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
       </div>
       
 <div id="S3" class='steps'>
-     <span class="num"> 3. </span>
+     <h3 class="num"> 3. Data in controller </h3>  Data in controllers/brain.js
        
            <pre><code>
-    
+    module.exports.getParts = function(req, res){
+      res.render('index', {
+        title: 'Parts of the Human Brain',
+        parts: [{
+                name: 'Cerebrum'
+                },
+                {
+                name: 'Cerebellum'
+                },
+                {
+                name: 'Pons'
+                }
+               ]                   
+            });
+    };
+
         </code></pre>
         
+      <pre><code>
+    module.exports.getPart = function(req, res){
+      res.render('part', {
+        title: 'Part of the brain.',
+        part: { 
+              name: 'Cerebrum',
+              meaning: 'brain',
+              functionalities: [
+                'Reasoning', 'Recognition', 
+                'Visual Processing', 'Speech'
+                ]
+              }
+         });
+    };
 
+      </code></pre>
+    Delete list in views/index.ejs and put: 
+    
+    <pre><code>
+    &lt;ul&gt;
+      &lt;% parts.forEach(function(part){ %&gt;
+      &lt;li&gt; &lt;a href="/part"&gt;&lt;%= part.name %&gt;&lt;/a&gt;&lt;/li&gt;
+      &lt;% }); %&gt;
+    &lt;/ul&gt;
+     </code></pre>
+
+    Delete two first paragraphs in views/part.ejs and put:
+    <pre><code>
+    &lt;p&gt;&lt;%= part.name %&gt; &lt;/p&gt;
+    &lt;p&gt; It means &lt;%= part.meaning%&gt;.&lt;/p&gt;
+     </code></pre>
+    Delete list in views/part.ejs and put:
+    <pre><code>
+    &lt;ul&gt;
+     &lt;% for(var i=0; i&lt;part.functionalities.length; i++) {%&gt;
+       &lt;li&gt;
+         &lt;span&gt;&lt;%= part.functionalities[i] %&gt;&lt;/span&gt;
+       &lt;/li&gt;
+     &lt;% } %&gt;
+    &lt;/ul&gt;
+   </code></pre>
       </div>
       
   </body>
