@@ -152,7 +152,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
       </div>
       
 <div id="S3" class='steps'>
-     <h3 class="num"> 3. Data in controller </h3>  Data in controllers/brain.js
+     <h3 class="num"> 3. Data in controller </h3> In this section we move the data to the controller file.  Replace the two existing functions in controllers/brain.js with the following code:
        
            <pre><code>
     module.exports.getParts = function(req, res){
@@ -189,7 +189,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     };
 
       </code></pre>
-    Delete list in views/index.ejs and put: 
+    Now we don't need the data in the views anymore. First delete your list in views/index.ejs, and instead of it put a for loop which is used to iterate over the list using &lt;% code %&gt;. The variable value is passed from the controller to the view with &lt;%= value %&gt;.   
     
     <pre><code>
     &lt;ul&gt;
@@ -199,12 +199,14 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     &lt;/ul&gt;
      </code></pre>
 
-    Delete two first paragraphs in views/part.ejs and put:
+    Next delete the two first paragraphs in views/part.ejs and instead of them put these lines.
+    
     <pre><code>
     &lt;p&gt;&lt;%= part.name %&gt; &lt;/p&gt;
     &lt;p&gt; It means &lt;%= part.meaning%&gt;.&lt;/p&gt;
      </code></pre>
-    Delete list in views/part.ejs and put:
+    
+    Finally delete your list in views/part.ejs and replace it with this code:
     <pre><code>
     &lt;ul&gt;
      &lt;% for(var i=0; i&lt;part.functionalities.length; i++) {%&gt;
@@ -214,6 +216,11 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
      &lt;% } %&gt;
     &lt;/ul&gt;
    </code></pre>
+    
+    After completing this section we are ready to check our project in the browser. You can get the code now by checking out step3:
+    <pre><code>
+    $ git checkout -f step3
+    </code></pre>
       </div>
       
   </body>
