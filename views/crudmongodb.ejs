@@ -16,7 +16,7 @@
         <li class="inside"><a href="#S1"> Starting a new project with Express </a> </li>
           <li class="inside"> <a href="#S2"> List of parts and one static part  </a></li>
           <li class="inside"> <a href="#S3"> Data in controller </a></li>
-      
+          <li class="inside"> <a href="#S4"> MongoDB and Schema </a></li>
       </ol>
       </div>
       
@@ -223,5 +223,123 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     </code></pre>
       </div>
       
+      <div id="S4" class='steps'>
+     <h3 class="num"> 4. MongoDB and Schema </h3> First let's create a color id between the span tag in views/part.ejs and
+          
+    <pre><code>
+    &lt;span id="color"&gt;&lt;%= part.functionalities[i] %&gt;&lt;/span&gt;
+    </code></pre>
+        we define the color in public/stylesheets/style.css. Add this code to the end of the file.
+          <pre><code>
+    #color {
+           color: blueviolet;
+           }
+      </code></pre> 
+      Now we set up our database by creating a new folder and by installing Moongose the bridge between MongoDB and Express. 
+          So create a folder called 'models' in the root folder and type the following in the consol.
+          <pre><code>
+    $ npm install mongoose --save
+      </code></pre>
+    In the models folder let's create a new file brainparts.js. The first line gets the Mongoose which we need for the Moongose schema. 
+    Next we define the schema 'partSchema' with a subdocument 'functionalitySchema'. Notice that the first requires the second. Last the model is compiled from the schema. 'Brainpart' is the name of the model and 'partSchema' is the schema to use. Because there is no MongoDB collection name given as an argument (it would be the third one), it will be automatically created from the model name as the lowercase pluralized version: 'brainparts'.  
+    
+    <pre><code>
+     var mongoose = require('mongoose');
+    
+     var partSchema = new mongoose.Schema({
+     name: { type: String, unique: true, required: true},
+     meaning: {type: String},
+     functionalities: [functionalitySchema]
+     });
+    
+     var functionalitySchema = new mongoose.Schema({
+     functionality: {type: String}
+     });
+    
+     mongoose.model('Brainpart', partSchema);
+    
+   </code></pre>
+
+      Now let's open a new file called braindb.js in the models folder. Moongose is reqiered here too. <br/> In this tutorial we will use the database in the cloud. Specifically we create our database in mLab. If you don't have an account, please sign up. Let's create a database called 'brainmlab' at MongoDb Deployments. (I chose Amazon and the free Sandbox and US East.) Now you should add a user at Users: Add database user. <br/> You should replace the dbURI with your own path to the database. You can find the path at: <br/> 'To connect using a driver via the standard MongoDB URI.' in mLab. Please use your username and password here. <br/>In the end we bring the models/brainparts file into models/braindb.js.
+      <pre><code>
+     var mongoose = require('mongoose');
+    
+     var dbURI = 'mongodb://username:password@ds123456.mlab.com:23456/brainmlab'
+     mongoose.connect(dbURI);
+     
+     require('./brainparts');
+    </code></pre>
+        Last we bring the braindb.js file into the application by requiring it in app.js after var bodyParser.  
+
+      <pre><code>
+     require('./models/braindb');
+      </code></pre>    
+     
+    After starting the application with nodemon, you will see that there is a new collection called 'brainparts' in mLab. Click on the name and create a new document (Add document) by adding this code between the given curly brackets. Save it at 'Create and go back' and you have your first document in the database. Congratulations!
+    <!--  <pre><code>
+      db.brainparts.save({
+      name: "Cerebrum",
+      meaning: "brain" 
+      })
+      </code></pre>
+    
+      <pre><code>
+      db.brainparts.update({
+      name: 'Cerebrum'
+      }, {
+      $push: {
+        functionalities: {
+            $each: [{
+                functionality: 'Reasoning'
+            },
+               {
+               functionality: 'Recognition'
+               },
+               {
+               functionality: 'Visual Processing'
+               },
+               {
+               functionality: 'Speech'
+               }
+            ]}
+         }
+      })
+    </code></pre>-->
+          
+      <pre><code>
+      "name": "Cerebrum",
+      "meaning": "brain",
+      "functionalities": [
+          {
+              "functionality": "Reasoning"
+          },
+          {
+              "functionality": "Recognition"
+          },
+          {
+              "functionality": "Visual Processing"
+          },
+          {
+              "functionality": "Speech"
+          }
+        ]
+     </code></pre>   
+          
+    <!--In models/braindb.js comment out var dbURI = 'mongodb://localhost:27017/Brain'; To connect using a driver via the standard MongoDB URI.
+   
+    <pre><code>
+   var dbURI = 'mongodb://username:password@ds143451.mlab.com:43451/brainmlab'
+   </code></pre>-->
+    At this point we finish step 4 and you can get the code by checking out step4. 
+    <pre><code>
+    $ git checkout -f step4
+    </code></pre>
+          
+    
+    
+      </div>
+      
+      <!--<pre><code>
+      </code></pre>-->
   </body>
 </html>
