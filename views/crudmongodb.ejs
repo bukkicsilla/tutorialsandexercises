@@ -4,7 +4,7 @@
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
-  <body>
+  <body class="crud">
       
       <div class="step0">
           
@@ -17,6 +17,7 @@
           <li class="inside"> <a href="#S2"> List of parts and one static part  </a></li>
           <li class="inside"> <a href="#S3"> Data in controller </a></li>
           <li class="inside"> <a href="#S4"> MongoDB and Schema </a></li>
+          <li class="inside"> <a href="#S5"> REST API: Reading documents in API development environment </a></li>
       </ol>
       </div>
       
@@ -275,7 +276,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
      require('./models/braindb');
       </code></pre>    
      
-    After starting the application with nodemon, you will see that there is a new collection called 'brainparts' in mLab. Click on the name and create a new document (Add document) by adding this code between the given curly brackets. Save it at 'Create and go back' and you have your first document in the database. Congratulations!
+    After starting the application with nodemon, you will see that there is a new collection called 'brainparts' in mLab. Click on the name and create a new document (Add document) by adding this code between the given curly brackets. Save it at 'Create and go back' and you have your first document in the database. Congratulations! <br/> Feel free to add more documents to your database.
     <!--  <pre><code>
       db.brainparts.save({
       name: "Cerebrum",
@@ -336,10 +337,96 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     </code></pre>
           
     
-    
+ </div>
+      <div id="S5" class='steps'>
+     <h3 class="num"> 5. REST API: Reading documents in API development environment </h3> We have a MongoDB database set up, but we can't interact with it yet. Here we build a REST API so we can reach the database and we cant test the HTTP GET call in Postman which is an API development environment for Chrome. You can download Postman or launch it as an extension. <br/>
+      Let's create a new file called brainApi.js in controllers folder in order to make some API calls. First we need Mongoose and the model. Next comes the function definition for reading all the documents with some error handlings.  
+
+
+
+         <pre><code>
+      var mongoose = require('mongoose');
+      var Brain = mongoose.model('Brainpart');
+
+      module.exports.allParts = function(req, res){
+        Brain.find({}, function(err, docs){
+        if (!err){
+           res.status(200);
+           res.json(docs); 
+          } else {throw err;}
+        });
+      }
+      </code></pre>  
+        In folder routes we create a file called indexApi.js where the route is defined to allParts. Express is required in this file, and we load the brainApi controller. With a help of a router we have the Request URL path to our list.  
+          
+      <pre><code>
+      var express = require('express');
+      var router = express.Router();
+      var brainparts = require('../controllers/brainApi');
+
+      router.get('/brainparts', brainparts.allParts);
+
+      module.exports = router;
+      </code></pre>
+          Before we can test our REST API call, let's put the following line which requires the API routes after
+          "var index = require('./routes/index');" in app.js.
+
+      <pre><code>
+      var indexApi = require('./routes/indexApi');
+      </code></pre>    
+          Also after "app.use('/', index);" in app.js we put:
+
+      <pre><code>
+      app.use('/api', indexApi);
+      </code></pre>
+     It's time to test this GET call in Postman. So open it and where is says: 'Enter request URL' paste http://localhost:3000/api/brainparts/, and choose method GET and push the Send button. You will see a list of documents with brain parts.   <br/><br/>  
+          
+          
+    In controllers/brainApi.js we put our function definition for getting only one brain part at a time. You can see some error handlings here too.
+
+     <pre><code>
+      module.exports.showPart = function(req, res){
+       if (req.params && req.params.brainpartid){
+         Brain.findById(req.params.brainpartid)
+              .exec(function(err, part){
+           if (!part){
+              res.status(404);
+              res.json("id not found");
+              return;
+           } else if(err){
+              res.status(404);
+              res.json(err);
+              return;
+           }
+         res.status(200);
+         res.json(part);
+       });
+       } else {
+         res.status(404);
+         res.json("no id in request");
+       }
+      }
+      </code></pre>
+          
+      In routes/indexApi.js we have the URL path to get one item. 
+      <pre><code>
+      router.get('/brainparts/:brainpartid', brainparts.showPart);
+      </code></pre>
+          Now let's test this function: After getting the whole list with allParts (previous step) we can choose in item ID ("_id":) and copy it. So for example this path works for me. You might have different Ids. 
+          Put http://localhost:3000/api/brainparts/5b5542e4e7179a0da546644c and choose method GET. 
+          <br><br> Step 5 is finished: 
+          <pre><code>
+    $ git checkout -f step5
+    </code></pre>
       </div>
       
-      <!--<pre><code>
-      </code></pre>-->
+      <!--<div id="S5" class='steps'>
+     <h3 class="num"> 5. </h3>
+ 
+      <pre><code>
+      </code></pre>
+
+      </div>-->
+      
   </body>
 </html>
