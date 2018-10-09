@@ -17,7 +17,8 @@
           <li class="inside"> <a href="#S2"> List of parts and one static part  </a></li>
           <li class="inside"> <a href="#S3"> Data in controller </a></li>
           <li class="inside"> <a href="#S4"> MongoDB and Schema </a></li>
-          <li class="inside"> <a href="#S5"> REST API: Reading documents in API development environment </a></li>
+          <li class="inside"> <a href="#S5"> Reading documents in API development environment </a></li>
+          <li class="inside"> <a href="#S6"> Seeing documents in the browser </a></li>
       </ol>
       </div>
       
@@ -339,7 +340,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     
  </div>
       <div id="S5" class='steps'>
-     <h3 class="num"> 5. REST API: Reading documents in API development environment </h3> We have a MongoDB database set up, but we can't interact with it yet. Here we build a REST API so we can reach the database and we cant test the HTTP GET call in Postman which is an API development environment for Chrome. You can download Postman or launch it as an extension. <br/>
+     <h3 class="num"> Reading documents in API development environment </h3> We have a MongoDB database set up, but we can't interact with it yet. Here we build a REST API so we can reach the database and we cant test the HTTP GET call in Postman which is an API development environment for Chrome. You can download Postman or launch it as an extension. <br/>
       Let's create a new file called brainApi.js in controllers folder in order to make some API calls. First we need Mongoose and the model. Next comes the function definition for reading all the documents with some error handlings.  
 
 
@@ -420,6 +421,111 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     </code></pre>
       </div>
       
+      <div id="S6" class='steps'>
+     <h3 class="num"> 6. Seeing documents in the browswer. </h3>
+ 
+      <pre><code>
+    $ npm install --save request
+      </code></pre>
+          In controllers/brain.js 
+        <pre><code>
+    var request = require('request');
+    var apiOps = {
+    server : "http://localhost:3000"
+};
+     </code></pre>
+  
+          Comment out getParts and replace it with the following code:
+       <pre><code>
+    module.exports.getParts = function(req, res){
+      var requestOps, path;
+      path = '/api/brainparts';
+      requestOps = {
+        url: apiOps.server + path,
+        method:"GET",
+        json: {},
+        qs: {}
+      };
+      request(requestOps, function(err, response, body){
+        var msg;
+        if (!(body instanceof Array)){
+          msg = "api lookup error";
+          body = [];
+        } else {
+          if(!body.length){
+            msg = "no part found";
+          }
+        }//else
+        //rendering
+        res.render('index', {
+          title : 'Parts of the Human Brain',
+            parts: body,
+            message: msg
+          });
+        })
+    }
+
+      </code></pre>
+    Route didn't change in routes/index.js for this function. Let's test our application in the browser: Go to http://localhost:3000/ and see the list which should come from the database now. 
+     <pre><code>
+    module.exports.getPart = function(req,res){
+      var requestOps, path;
+      path = "/api/brainparts/" + req.params.brainpartid;
+    
+      requestOps = {
+        url: apiOps.server + path,
+        method: "GET",
+        json: {}
+      };
+      request(requestOps, 
+        function(err, response, body){
+          if (response.statusCode === 200){
+            res.render('part', {
+              title: 'Part info',
+              part: body,
+              part: {
+                name: body.name,
+                meaning: body.meaning,
+                functionalities: body.functionalities
+              }
+            
+            });
+          } else  {
+            if (response.statusCode === 404){
+              title = "404, page not found";
+            } else {
+              title = response.statusCode + ", sorry";
+            }
+                
+            res.status(response.statusCode);
+            res.render('error', {
+              title: title,
+              message: "Try with different id, page not found",
+              error: {
+                status: response.statusCode,
+                stack: 'go back to brain part list'
+              }
+            });   
+          }//else
+        });//function
+    }
+
+      </code></pre>
+          In routes/index.js
+          <pre><code>
+    router.get('/part/:brainpartid', brainController.getPart);
+      </code></pre>
+          In views/part.ejs
+          <pre><code>
+    &lt;ul&gt;  
+      &lt;% part.functionalities.forEach(function(functionality){ %&gt;
+        &lt;li&gt;
+          &lt;span&gt;&lt;%= functionality.functionality %&gt;&lt;/span&gt;
+        &lt;/li&gt;
+      &lt;% }); %&gt;
+    &lt;/ul&gt;
+      </code></pre>
+      </div>
       <!--<div id="S5" class='steps'>
      <h3 class="num"> 5. </h3>
  
