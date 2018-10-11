@@ -340,7 +340,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     
  </div>
       <div id="S5" class='steps'>
-     <h3 class="num"> Reading documents in API development environment </h3> We have a MongoDB database set up, but we can't interact with it yet. Here we build a REST API so we can reach the database and we cant test the HTTP GET call in Postman which is an API development environment for Chrome. You can download Postman or launch it as an extension. <br/>
+     <h3 class="num"> 5. Reading documents in API development environment </h3> We have a MongoDB database set up, but we can't interact with it yet. Here we build a REST API so we can reach the database and we cant test the HTTP GET call in Postman which is an API development environment for Chrome. You can download Postman or launch it as an extension. <br/>
       Let's create a new file called brainApi.js in controllers folder in order to make some API calls. First we need Mongoose and the model. Next comes the function definition for reading all the documents with some error handlings.  
 
 
@@ -423,19 +423,20 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
       
       <div id="S6" class='steps'>
      <h3 class="num"> 6. Seeing documents in the browswer. </h3>
- 
+   In the last section we could see in Postman what is it inside the Mongo database. Now we will be able to read the documents from the database in the browser. 
+   First let's install request module so the Express application can call the API URLs. 
       <pre><code>
     $ npm install --save request
       </code></pre>
-          In controllers/brain.js 
+          After that we include request and the default server URL for local development is set in controllers/brain.js 
         <pre><code>
     var request = require('request');
     var apiOps = {
     server : "http://localhost:3000"
-};
+    };
      </code></pre>
   
-          Comment out getParts and replace it with the following code:
+        Now comment out getParts function  and replace it with the following code:
        <pre><code>
     module.exports.getParts = function(req, res){
       var requestOps, path;
@@ -466,7 +467,12 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     }
 
       </code></pre>
-    Route didn't change in routes/index.js for this function. Let's test our application in the browser: Go to http://localhost:3000/ and see the list which should come from the database now. 
+      In the requestOps has the options: url has full URL of the request, method can be: GET, POST, PUT, or DELETE, json is the body of the request,
+      here it is empty, and finally qs represents any query string parameters, also empty. Then we call request() with the options and a callback function.
+      The call back function runs when the response comes back from the API, and has the parameters: an error object, the full response, and the parsed body of the response. (explanation from the book Getting MEAN by Simon Holmes) <br><br>
+    Route didn't change in routes/index.js for this function. Let's test our application in the browser: Go to http://localhost:3000/ and see the list which should come from the database now.
+    <br><br> So far we can read the whole list. But we would like to get the information from the database for one item by clicking on one brain part. So comment out getPart function and replace it with this:
+      
      <pre><code>
     module.exports.getPart = function(req,res){
       var requestOps, path;
@@ -511,11 +517,21 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     }
 
       </code></pre>
-          In routes/index.js
+      Here again we have options, which goes into request(). In the callback function if the response is succesful (statusCode === 200) the data is read from the response body,
+      otherwise we see error messages. <br><br> 
+          In routes/index.js the route to getPart() is not correct now, because we need to give the ID of the part we would like to see. So let's change that:
           <pre><code>
     router.get('/part/:brainpartid', brainController.getPart);
       </code></pre>
-          In views/part.ejs
+      Also in views/index.ejs the links needs the ID. Replace the given list with this: 
+      <pre><code>
+    &lt;ul&gt;
+    &lt;% parts.forEach(function(part){ %&gt;
+    &lt;li&gt; &lt;a href='/part/&lt;%= part._id %&gt;'&gt;&lt;%= part.name %&gt;&lt;/a&gt;&lt;/li&gt;
+    &lt;% }); %&gt;
+    &lt;/ul&gt;
+      </code></pre>
+          Finally in views/part.ejs the list has to be replaced with the following code in order to get the functionality list.
           <pre><code>
     &lt;ul&gt;  
       &lt;% part.functionalities.forEach(function(functionality){ %&gt;
@@ -524,6 +540,10 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         &lt;/li&gt;
       &lt;% }); %&gt;
     &lt;/ul&gt;
+      </code></pre>
+      Step 6 is finished and you can get the code: 
+      <pre><code>
+    git checkout -f step6
       </code></pre>
       </div>
       <!--<div id="S5" class='steps'>
