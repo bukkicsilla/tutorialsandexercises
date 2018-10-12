@@ -19,6 +19,10 @@
           <li class="inside"> <a href="#S4"> MongoDB and Schema </a></li>
           <li class="inside"> <a href="#S5"> Reading documents in API development environment </a></li>
           <li class="inside"> <a href="#S6"> Seeing documents in the browser </a></li>
+          <li class="inside"> <a href="#S7"> Creating documents</a></li>
+          <li class="inside"> <a href="#S8"> Deleting documents </a></li>
+          <li class="inside"> <a href="#S9"> Updating single subdocuments </a></li>
+          <li class="inside"> <a href="#S10"> Updating list subdocuments </a></li>
       </ol>
       </div>
       
@@ -546,6 +550,44 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     git checkout -f step6
       </code></pre>
       </div>
+      <div id="S7" class='steps'>
+     <h3 class="num"> 7. Creating documents. </h3>
+     In the first part of this section we learn how to create a brain part in Postman. This new item will be stored in Mongo database. 
+     You can see it later in mLab or on your local database on your computer. First let's define an API function in controllers/brainApi.js to be able to create new items. 
+     <pre><code>
+    module.exports.createPart = function(req, res){
+      Brain.create({
+        name: req.body.name,
+        meaning: req.body.meaning,
+        functionalities: req.body.functionalities
+      }, function(err, part){
+        if(err){
+          res.status(400);
+          res.json(err);
+        } else {
+          res.status(201);
+          res.json(part);
+        }
+      });
+    }
+
+      </code></pre>
+     The name, meaning and the funcionality list is set by using the request body information respectively. 
+     If creation is succesful (status is 201), the respond is set by using the given information (parsing a JSON format). <br><br>
+     We also need a route definition in routes/indexApi.js:
+      <pre><code>
+    router.post('/brainparts', brainparts.createPart);
+      </code></pre>
+      Now we can test the createPart function in Postman. The URL is http://localhost:3000/api/brainparts/ and choose method POST this time. 
+      Before pushing the Save button, a new brain part data has to be defined in JSON format. In Postman choose Body, raw and JSON(application/json).
+      If you can't find this push the + button (new item) and set URL and the method and the data described just before. Copy the following definition 
+      in the textarea in Postman. Now send the request. And we have a new part in our database.   
+      <pre><code>
+    {"name" : "Thalamus", "meaning": "inner room", "functionalities": [{"functionality":"sensory switch center"}, {"functionality": "relay station"}]}
+     </code></pre>
+     In the second part we will create a new item in the browser and use our API createPart function to save the new item in the database. 
+      
+     </div>
       <!--<div id="S5" class='steps'>
      <h3 class="num"> 5. </h3>
  
