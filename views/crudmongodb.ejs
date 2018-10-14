@@ -17,8 +17,8 @@
           <li class="inside"> <a href="#S2"> List of parts and one static part  </a></li>
           <li class="inside"> <a href="#S3"> Data in controller </a></li>
           <li class="inside"> <a href="#S4"> MongoDB and Schema </a></li>
-          <li class="inside"> <a href="#S5"> Reading documents in API development environment </a></li>
-          <li class="inside"> <a href="#S6"> Seeing documents in the browser </a></li>
+          <li class="inside"> <a href="#S5"> Reading documents in Postman </a></li>
+          <li class="inside"> <a href="#S6"> Seeing documents in the Browser </a></li>
           <li class="inside"> <a href="#S7"> Creating documents</a></li>
           <li class="inside"> <a href="#S8"> Deleting documents </a></li>
           <li class="inside"> <a href="#S9"> Updating single subdocuments </a></li>
@@ -344,7 +344,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     
  </div>
       <div id="S5" class='steps'>
-     <h3 class="num"> 5. Reading documents in API development environment </h3> We have a MongoDB database set up, but we can't interact with it yet. Here we build a REST API so we can reach the database and we cant test the HTTP GET call in Postman which is an API development environment for Chrome. You can download Postman or launch it as an extension. <br/>
+     <h3 class="num"> 5. Reading documents in Postman. </h3> We have a MongoDB database set up, but we can't interact with it yet. Here we build a REST API so we can reach the database and we cant test the HTTP GET call in Postman which is an API development environment for Chrome. You can download Postman or launch it as an extension. <br/>
       Let's create a new file called brainApi.js in controllers folder in order to make some API calls. First we need Mongoose and the model. Next comes the function definition for reading all the documents with some error handlings.  
 
 
@@ -426,7 +426,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
       </div>
       
       <div id="S6" class='steps'>
-     <h3 class="num"> 6. Seeing documents in the browswer. </h3>
+     <h3 class="num"> 6. Seeing documents in the Browswer. </h3>
    In the last section we could see in Postman what is it inside the Mongo database. Now we will be able to read the documents from the database in the browser. 
    First let's install request module so the Express application can call the API URLs. 
       <pre><code>
@@ -585,68 +585,133 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
       <pre><code>
     {"name" : "Thalamus", "meaning": "inner room", "functionalities": [{"functionality":"sensory switch center"}, {"functionality": "relay station"}]}
      </code></pre>
-     In the second part we will create a new item in the browser and use our API createPart function to save the new item in the database. 
-      <pre><code>
-    router.post('/createpart', brainController.createPart);
+          
+     In the second part we will create a new item in the browser and use our API createPart function to save the new item in the database. We will need a form first and a route has to be determined with a GET request. In routes/index.js copy:
+     <pre><code>
+    router.get('/createpart', brainController.formCreatePart);
       </code></pre>
-      
-      <pre><code>
-      module.exports.createPart = function(req, res){
- var requestOps, path, postdata;
-    path = '/api/brainparts';
-    var funclist = req.body.formfunc.split(",");
-    
-    var funcdict = [];
-    if (funclist[0] !== ""){
-      var l = funclist.length;
-      var i;
-      for (i = 0; i &lt;l; i++){
-         funcdict.push({
-            "functionality": funclist[i]
-         });
-      }
+      The corresponding formCreatePart function in controllers/brain.js is given as:
+          <pre><code>
+    module.exports.formCreatePart = function(req, res){
+      res.render('createpart', {
+        title: 'Create Brain Part',
+        error: req.query.err
+      });
     }
-    postdata = {
-    name: req.body.formname,    
-    meaning: req.body.formmeaning,
-    functionalities: funcdict
-    };
-    if (postdata.meaning === ""){
-        postdata.meaning = "??";
+      </code></pre>
+     We need to create a file named createpart.ejs, but before that let's add a link in views/index.ejs to this file. 
+    <pre><code>
+    &lt;a class="change" href='/createpart'&gt; New Brain Part &lt;/a&gt;
+      </code></pre>
+  Some css changes in public/stylesheets/style.css:
+          <pre><code>
+    .change{
+      font-size: 150%;
+      color: white;
+      background: red;
+      padding:5px;
+      border-radius: 48%;
     }
-   
-    requestOps = {
-    url : apiOps.server + path,
-    method : "POST",
-    json : postdata
-  };
-  if (!postdata.name) {
-    res.redirect('/createpart/');
-  } else {
-    request(
-      requestOps,
-      function(err, response, body) {
-        if (response.statusCode === 201) {
-          res.redirect('/');
-        } else if (response.statusCode === 400 && body.name && body.name === "ValidationError" ) {
-          res.redirect('/createpart/');
-        } else {
-        res.status(response.statusCode);
-        res.render('error', {
-               message: "The name must be unique!",
-                error: {
-                    status: response.statusCode,
-                    stack: 'go back to the form'
-                }
-  });
-        }
-      }
-    );
-  }     
-}
+    a {
+      text-decoration: none;
+    }  
+      </code></pre>
+          Now we can populate our createpart.ejs file in the views folder.
+     <pre><code>
+    &lt;!DOCTYPE html&gt;
+    &lt;html&gt;
+      &lt;head&gt;
+        &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+        &lt;title&gt;&lt;%= title %&gt;&lt;/title&gt;
+        &lt;link rel='stylesheet' href='/stylesheets/style.css'/&gt;
+      &lt;/head&gt;
+      &lt;body&gt;
+        &lt;h1&gt; Create a Brain Part &lt;/h1&gt;
+        &lt;form class="form-horizontal" action="" method="post" role="form"&gt;
+          &lt;p&gt; Name is requiered. Separate functionalities with commas.&lt;/p&gt;
+          &lt;table&gt;
+            &lt;tr&gt;
+              &lt;td&gt;Name&lt;/td&gt;
+              &lt;td&gt;&lt;input type="text" name="formname"&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td&gt;Meaning&lt;/td&gt;
+              &lt;td&gt;&lt;input type="text" name="formmeaning"&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+              &lt;td&gt;Funcionalities&lt;/td&gt;
+              &lt;td&gt;&lt;input type="text" name="formfunc"&gt;&lt;/td&gt;
+            &lt;/tr&gt;      
+            &lt;tr&gt;
+              &lt;td colspan="2"&gt;&lt;input type="submit" value="Save"&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;/table&gt;
+        &lt;/form&gt;
+      &lt;/body&gt;
+    &lt;/html&gt;
 
       </code></pre>
+     At this point you should be able to see a form and you can fill it out, but we still can't send the data. Let's fix it. 
+          In routes/index.js the route has to be determined with a POST request.
+          <pre><code>
+    router.post('/createpart', brainController.createPart);
+      </code></pre>
+      Finally we create the createPart function. By using a dictionary (key value pairs) the functionality list is parsed from the input.
+          Postdata gets the remaining data from the request body with the names (formname...) given in the input fields. If the creation is succesful, the application will be redirected to '/'. If the name field left empty the form is shown again. You can see a few other error handlings here too.  
       <pre><code>
+    module.exports.createPart = function(req, res){
+      var requestOps, path, postdata;
+      path = '/api/brainparts';
+      var funclist = req.body.formfunc.split(",");
+      var funcdict = [];
+      if (funclist[0] !== ""){
+        var l = funclist.length;
+        var i;
+        for (i = 0; i &lt;l; i++){
+          funcdict.push({ "functionality": funclist[i] });
+        }
+      }
+      postdata = {
+        name: req.body.formname,    
+        meaning: req.body.formmeaning,
+        functionalities: funcdict
+      };
+      if (postdata.meaning === ""){
+        postdata.meaning = "??";
+      }
+      requestOps = {
+        url : apiOps.server + path,
+        method : "POST",
+        json : postdata
+      };
+      if (!postdata.name) {
+        res.redirect('/createpart/');
+      } else {
+        request(
+          requestOps, function(err, response, body) {
+            if (response.statusCode === 201) {
+              res.redirect('/');
+            } else if (response.statusCode === 400 && body.name && body.name === "ValidationError" ) {
+              res.redirect('/createpart/');
+            } else {
+              res.status(response.statusCode);
+              res.render('error', {
+                message: "The name must be unique!",
+                error: {
+                  status: response.statusCode,
+                  stack: 'go back to the form'
+                }
+              });
+            }
+          }
+        );
+      }     
+   }
+
+      </code></pre>
+          We are done with this step. You check it out now. 
+      <pre><code>
+      git checkout -f step7
       </code></pre>
      </div>
       <!--<div id="S5" class='steps'>
