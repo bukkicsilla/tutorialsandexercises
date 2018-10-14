@@ -550,6 +550,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     git checkout -f step6
       </code></pre>
       </div>
+      
       <div id="S7" class='steps'>
      <h3 class="num"> 7. Creating documents. </h3>
      In the first part of this section we learn how to create a brain part in Postman. This new item will be stored in Mongo database. 
@@ -714,6 +715,41 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
       git checkout -f step7
       </code></pre>
      </div>
+      
+       <div id="S8" class='steps'>
+     <h3 class="num"> 8. Deleting documents. </h3> routes/indexApi.js
+        <pre><code>
+        router.delete('/brainparts/:brainpartid', brainparts.deletePart);
+      </code></pre>
+           controllers/brainApi.js
+           <pre><code>
+           module.exports.deletePart = function(req, res){
+    var partid = req.params.brainpartid;
+    if (partid){
+        Brain.findByIdAndRemove(partid)
+           .exec(
+                function(err, part){
+                    if(err){
+                        res.status(404);
+                        res.json(err);
+                        return;
+                    }
+                    res.status(204);
+                    res.json(null);
+                });
+    } else {
+        res.status(404);
+        res.json({"message":"no id"});
+    } 
+} 
+      </code></pre>
+           Create an item in the browser by filling out the form from step 7.
+           Delete this item in Postman: first get the list by sending a GET request, then find the ID of the item.
+           Lastly send a DELETE request with the URL: (no data in JSON) http://localhost:3000/api/brainparts/id 
+        <pre><code>
+        git checkout -f step8
+      </code></pre>
+      </div>   
       <!--<div id="S5" class='steps'>
      <h3 class="num"> 5. </h3>
  
