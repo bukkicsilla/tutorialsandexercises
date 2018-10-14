@@ -719,35 +719,90 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
        <div id="S8" class='steps'>
      <h3 class="num"> 8. Deleting documents. </h3> routes/indexApi.js
         <pre><code>
-        router.delete('/brainparts/:brainpartid', brainparts.deletePart);
+      router.delete('/brainparts/:brainpartid', brainparts.deletePart);
       </code></pre>
            controllers/brainApi.js
            <pre><code>
-           module.exports.deletePart = function(req, res){
-    var partid = req.params.brainpartid;
-    if (partid){
-        Brain.findByIdAndRemove(partid)
-           .exec(
-                function(err, part){
-                    if(err){
-                        res.status(404);
-                        res.json(err);
-                        return;
-                    }
-                    res.status(204);
-                    res.json(null);
-                });
-    } else {
-        res.status(404);
-        res.json({"message":"no id"});
-    } 
-} 
+      module.exports.deletePart = function(req, res){
+        var partid = req.params.brainpartid;
+        if (partid){
+          Brain.findByIdAndRemove(partid)
+            .exec(
+              function(err, part){
+                if(err){
+                  res.status(404);
+                  res.json(err);
+                  return;
+                }
+                res.status(204);
+                res.json(null);
+            });
+        } else {
+          res.status(404);
+          res.json({"message":"no id"});
+        } 
+      } 
       </code></pre>
            Create an item in the browser by filling out the form from step 7.
            Delete this item in Postman: first get the list by sending a GET request, then find the ID of the item.
-           Lastly send a DELETE request with the URL: (no data in JSON) http://localhost:3000/api/brainparts/id 
+           Lastly send a DELETE request in Postman with the URL: (no data in JSON) http://localhost:3000/api/brainparts/id 
+        
         <pre><code>
-        git checkout -f step8
+      router.get('/deletepart/:brainpartid', brainController.deletePart);
+      </code></pre>
+           <pre><code>
+      module.exports.deletePart = function(req, res){
+        var requestOps, path;
+        path = "/api/brainparts/" + req.params.brainpartid;
+          requestOps = {
+            url: apiOps.server + path,
+            method: "DELETE",
+            json: {}
+          };
+          request(requestOps, 
+            function(err, response, body){
+              if (response.statusCode === 204){
+                 res.redirect('/');
+              } else  {
+                 if (response.statusCode === 404){
+                   title = "404, page not found";
+                 } else {
+                   title = response.statusCode + ", sorry";
+                 }
+                res.status(response.statusCode);
+                res.render('error', {
+                  title: title,
+                  message: "Try with different id, page not found",
+                  error: {
+                    status: response.statusCode,
+                    stack: 'go back to movie list'
+                  }
+                });    
+              }//else
+            }
+          );
+      } 
+
+      </code></pre>
+           <pre><code>
+      brainpart: body,
+      </code></pre>
+      <pre><code>
+      &lt;br&gt;&lt;br&gt;
+      &lt;a href='/deletepart/&lt;%= brainpart._id %&gt;' class="changepart"&gt; Delete this part. &lt;/a&gt;
+      </code></pre>
+      <pre><code>
+      .changepart{
+        font-size: 140%;
+        color: white;
+        background: forestgreen;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 50%;
+      }
+      </code></pre>
+        <pre><code>
+      git checkout -f step8
       </code></pre>
       </div>   
       <!--<div id="S5" class='steps'>
