@@ -717,11 +717,11 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
      </div>
       
        <div id="S8" class='steps'>
-     <h3 class="num"> 8. Deleting documents. </h3> routes/indexApi.js
+     <h3 class="num"> 8. Deleting documents. </h3> In the first part of this section we learn how to delete a brain part in Postman. This new item will be deleted from Mongo database. In routes/indexApi.js we define the route to delete the item. Notice we need the ID.
         <pre><code>
       router.delete('/brainparts/:brainpartid', brainparts.deletePart);
       </code></pre>
-           controllers/brainApi.js
+           The deletePart function in controllers/brainApi.js looks like:
            <pre><code>
       module.exports.deletePart = function(req, res){
         var partid = req.params.brainpartid;
@@ -743,13 +743,16 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         } 
       } 
       </code></pre>
-           Create an item in the browser by filling out the form from step 7.
+           To test the API delete function, create an item in the browser by filling out the form from step 7.
            Delete this item in Postman: first get the list by sending a GET request, then find the ID of the item.
            Lastly send a DELETE request in Postman with the URL: (no data in JSON) http://localhost:3000/api/brainparts/id 
-        
+           <br><br>
+        In the second part we will delete an item in the browser and use our API deletePart function to delete the item from the database.
+           In order to delete the item, we need to send a GET request:  
         <pre><code>
       router.get('/deletepart/:brainpartid', brainController.deletePart);
       </code></pre>
+        The corresponding delete function is defined this way:
            <pre><code>
       module.exports.deletePart = function(req, res){
         var requestOps, path;
@@ -784,13 +787,16 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
       } 
 
       </code></pre>
+      In a previous step accidentaly I defined 'part' twice in controllers/brain.js. The first definition is overwritten by the second. Now let's change the first one 'part: body,' to 'brainpart: body,'. 
            <pre><code>
       brainpart: body,
       </code></pre>
+           The change was necessary in order to get the body ID, in that case 'brainpart._id' has the body ID. In views/part.ejs we add a delete button as a link after the functionality list. 
       <pre><code>
       &lt;br&gt;&lt;br&gt;
       &lt;a href='/deletepart/&lt;%= brainpart._id %&gt;' class="changepart"&gt; Delete this part. &lt;/a&gt;
       </code></pre>
+           Polishing the delete button gives the class definition in public/stylesheets/style.css
       <pre><code>
       .changepart{
         font-size: 140%;
@@ -801,6 +807,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         border-radius: 50%;
       }
       </code></pre>
+           Step 8 is finished, you can get the code now:
         <pre><code>
       git checkout -f step8
       </code></pre>
