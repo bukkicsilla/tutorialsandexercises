@@ -710,7 +710,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
    }
 
       </code></pre>
-          We are done with this step. You check it out now. 
+          We are done with this step. You can check it out now. 
       <pre><code>
       git checkout -f step7
       </code></pre>
@@ -814,56 +814,56 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
       </div>   
       
       <div id="S9" class='steps'>
-     <h3 class="num"> 9. Updating single subdocuments. </h3>
+     <h3 class="num"> 9. Updating single subdocuments. </h3>In the first part of this section we learn how to update the meaning of a  brain part in Postman. The updated meaning will be stored in Mongo database. The route definition in routes/indexApi.js is defined with the method PUT. 
           
         <pre><code>
         router.put('/brainparts/:brainpartid', brainparts.updateMeaning);
       </code></pre>
-          
+           The API function updateMeaning  is in controllers/brainApi.js.  
           <pre><code>
-          module.exports.formUpdateFunctionalities = function(req, res){
-    
-    var requestOps, path;
-    path = "/api/brainparts/" + req.params.brainpartid;
-    
-    requestOps = {
-        url: apiOps.server + path,
-        method: "GET",
-        json: {}
-    };
-    request(requestOps, 
-           function(err, response, body){
-                var funclist = "";
-                var l = body.functionalities.length;
-                var i;
-                if (l %gt; 0){
-                for (i = 0; i %lt; l-1; i++){
-                    funclist += body.functionalities[i].functionality + ', '
-                }
-                funclist += body.functionalities[l-1].functionality;
-                }
-                res.render('updatefunctionalities', {
-            title: 'Update functionalities',
-            error: req.query.err,
-            brainpart: body,
-            part:{
-                name: body.name,
-                meaning: body.meaning,
-                functionalities: funclist
+          module.exports.updateMeaning = function(req, res){
+    if(!req.params.brainpartid){
+        res.status(404);
+        res.json({"message": "id not found, it is required"});    
+        return;
+    }
+    Brain.findById(req.params.brainpartid)
+       .select('-name')
+       .exec(
+        function(err, part){
+            if(!part){
+                res.status(404);
+                res.json({"message":"brain part is not found"});
+                return;
+            } else if (err) {
+                res.status(400);
+                res.json(err);
+                return;
             }
-      });
-    });
-  };
+            if (req.body.meaning)  part.meaning = req.body.meaning;
+            
+            part.save(function(err, part){
+                if (err){
+                    res.status(404);
+                    res.json(err);
+                } else {
+                    res.status(200);
+                    res.json(part);
+                }   
+        });
+  });
+}
+
       </code></pre>
-          URL: http://localhost:3000/api/brainparts/id, method: PUT
+          Now we can test the updateMeaning function in Postman to set or update a meaning. The URL is http://localhost:3000/api/brainparts/id and choose method PUT. Before pushing the Save button, a new meaning has to be given in JSON format. In Postman choose Body, raw and JSON(application/json). Copy the following definition in the textarea in Postman. Now send the request. And we have the updated meaning in our database.
           <pre><code>
         {"meaning":"thinking"}
       </code></pre>
-          Browser:
+          In the second part we will update the meaning in the browser and use our API updateMeaning function to save the updated meaning in the database. We will need a form first and a route has to be determined with a GET request. In routes/index.js copy:
           <pre><code>
           router.get('/updatemeaning/:brainpartid', brainController.formUpdateMeaning);
       </code></pre>
-          
+          The corresponding formUpdateMeaning function in controllers/brain.js is shown as:
           <pre><code>
           module.exports.formUpdateMeaning = function(req, res){
     
@@ -891,7 +891,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     
 };
   </code></pre>
-          
+          We need to create a file named updatemeaning.ejs in the views folder. 
           <pre><code>
 &lt;!DOCTYPE html&gt;
 &lt;html&gt;
@@ -917,14 +917,15 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
   &lt;/body&gt;
 &lt;/html&gt;
  </code></pre>
-          
+          We also need to add a link in views/index.ejs. 
           <pre><code>
           &lt;a href='/updatemeaning/&lt;%= brainpart._id %&gt;' class="changepart"&gt; Update meaning. &lt;/a&gt;
       </code></pre>
+          Now the updated meaning has to be sent with a POST request. In routes/index.js put the route method: 
           <pre><code>
           router.post('/updatemeaning/:brainpartid', brainController.updateMeaning);
       </code></pre>
-          
+          Finally we create the updateMeaning function. If the update is succesful, the application will be redirected to '/part/id'. If the name field left empty the form is shown again.
            <pre><code>
            module.exports.updateMeaning = function(req, res){
     
@@ -969,16 +970,19 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
   } //else 
       
 }
-
-      </code></pre>
+</code></pre>
+          Step 9 is finished.
+          <pre><code>
+          git checkout -f step9
+          </code></pre>
       </div>
       
       <div id="S10" class='steps'>
-     <h3 class="num"> 10. Updating list subdocuments. </h3>
+     <h3 class="num"> 10. Updating list subdocuments. </h3>In the first part of this section we learn how to update the funtionalities of a brain part in Postman. The updated functionalities will be stored in Mongo database. The route definition in routes/indexApi.js is given with the method PUT.
           <pre><code>
           router.put('/brainparts/:brainpartid/functionalities', brainparts.updateFunctionalities);
       </code></pre>
-          
+          The API function updateFunctionalities is in controllers/brainApi.js.
           <pre><code>
           module.exports.updateFunctionalities = function(req, res){
 
@@ -1014,17 +1018,16 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         });
   });
 }
-      </code></pre>
-          URL http://localhost:3000/api/brainparts/id/functionalities, method: PUT
+      </code></pre>Now we can test the updateFuncionalities function in Postman to set or update a functionality list. The URL is http://localhost:3000/api/brainparts/id/functionalities and choose method PUT. Before pushing the Save button, a new functinality list has to be given in JSON format. In Postman choose Body, raw and JSON(application/json). Copy the following definition in the textarea in Postman. Now send the request. And we have the updated funcionality list in our database.
           <pre><code>
           {"functionalities": [ {"functionality":"Posture"}, {"functionalities":"Balance"}]}
       </code></pre>
-          
-          <code><pre>
-          router.get('/updatefunctionalities/:brainpartid', brainController.formUpdateFunctionalities);
-           </pre></code>
-          
-          <code><pre>
+          In the second part we will update the functionality list in the browser and use our API updateFunctionalities function to save the updated functionality list in the database. We define a form first and a route has to be determined with a GET request. In routes/index.js copy:
+     <pre><code>
+        router.get('/updatefunctionalities/:brainpartid', brainController.formUpdateFunctionalities);
+           </code></pre>
+          The formUpdateMeaning function in controllers/brain.js is given as:
+          <pre><code>
           module.exports.formUpdateFunctionalities = function(req, res){
     
     var requestOps, path;
@@ -1059,9 +1062,9 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
     });
 };
 
-          </pre></code>
-
-          <code><pre>
+          </code></pre>
+We need to create a file named updatefunctionalities.ejs in the views folder.
+          <pre><code>
           &lt;!DOCTYPE html&gt;
 &lt;html&gt;
   &lt;head&gt;
@@ -1091,16 +1094,17 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
   &lt;/body&gt;
 &lt;/html&gt;
 
-          </pre></code>
-          
-        <code><pre>
+          </code></pre>
+          We also need to add a link in views/index.ejs.
+        <pre><code>
         &lt;a href='/updatefunctionalities/&lt;%= brainpart._id %&gt;' class="changepart"&gt; Update functionalities &lt;/a&gt;
-        </pre></code>
-          <code><pre>
+        </code></pre>
+          Now the updated functionality list has to be sent with a POST request. In routes/index.js put the route method:
+          <pre><code>
           router.post('/updatefunctionalities/:brainpartid', brainController.updateFunctionalities);
-        </pre></code>
-          
-          <code><pre>
+        </code></pre>
+          Finally we create the updateFunctionalities function. If the update is succesful, the application will be redirected to '/part/id'. If the name field left empty the form is shown again.
+          <pre><code>
           module.exports.updateFunctionalities = function(req, res){
     
     var requestOps, path, partid, postdata;
@@ -1153,9 +1157,11 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
   } //else 
     
 }
-
-        </pre></code>
-          
+</code></pre>
+          We are done with this step. You can check it out now.
+   <pre><code>
+   git checkout -f step10
+    </code></pre>          
       </div>  
   </body>
 </html>
