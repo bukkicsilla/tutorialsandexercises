@@ -3,6 +3,8 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <!--<link rel='stylesheet' href='/stylesheets/prism_tomorrownight.css' />
+    <script src="/javascripts/prism_tomorrownight.js"></script>-->
   </head>
   <body class="crud">
       
@@ -45,11 +47,11 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         
         We are going to change the title from 'Express' to 'Parts of the Human Brain' in the routes/index.js file. After that we comment out the welcome line in views/index.ejs file. Now you can check your browser again. 
         
-        <pre><code>
+        <pre><code class="language-javascript">
         res.render('index', { title: 'Parts of the Human Brain' });
         </code></pre>
         
-        <pre><code>
+        <pre><code class="language-markup">
         &lt;&#33;--&lt;p&gt;Welcome to &lt;%= title %&gt;&lt;/p&gt;--&gt;
         </code></pre>
         
@@ -58,15 +60,15 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         $ mkdir controllers
         </code></pre>
         In that new directory let's open a new file brain.js and define a function getParts in brain.js. We don't need the router.get function in router/index.js so we comment it out. Instead we define a new router.get function which uses the function getParts defined in brain.js. In order to use this function it should be imported, so we define a new variable called brainController after the definition of var router, which imports the whole content of the brain.js file.  
-        <pre><code>
+        <pre><code class="language-javascript">
         module.exports.getParts = function(req, res){
           res.render('index', {title: 'Parts of the Human Brain'});
         };
         </code></pre>
-        <pre><code>
+        <pre><code class="language-javascript">
         router.get('/', brainController.getParts);
         </code></pre>
-        <pre><code>
+        <pre><code class="language-javascript">
         var brainController = require('../controllers/brain');
         </code></pre>
         
@@ -93,7 +95,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
       
     <div id="S2" class='steps'>
      <h3 class="num"> 2. List of parts and one static part </h3> In views/index.ejs first we creat our list with only 3 parts of the brain. Let's put this list after the line with the title. Later we can add more of the parts of the brain in form using mongodb database. 
-           <pre><code>
+           <pre><code class="language-markup">
         &lt;ul&gt;
            &lt;li&gt;Cerebrum&lt;/li&gt;
            &lt;li&gt;Cerebellum&lt;/li&gt;
@@ -103,7 +105,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
         
         Some styling is needed for better readability. In public/stylesheets/style.css we add: 
         
-  <pre><code>
+  <pre><code class="language-css">
         li, p {
             font-size: 18px;
         }
@@ -111,19 +113,19 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
 </code></pre>
         Now we would like to see some of the details of one brain area. The first part is the Cerebrum in the list, so we use that and we need a new part.ejs page for that. But before that let's define a function getPart in controllers/brain.js. The 'part' means the part.ejs file we will create soon.
         
-        <pre><code>
+        <pre><code class="language-javascript">
         module.exports.getPart = function(req, res){
            res.render('part', {title: 'Part of the brain.'});
         };
         </code></pre>
 
         To show the details, a route method has to be set up in routes/index.js, which uses the function getPart.
-        <pre><code>
+        <pre><code class="language-javascript">
         router.get('/part', brainController.getPart);
         </code></pre>
         
         Now let's create the part.ejs file in views and populate it with the following code:
-        <pre><code>
+        <pre><code class="language-markup">
     &lt;!DOCTYPE html&gt;
       &lt;html&gt;
         &lt;head&gt;
@@ -147,7 +149,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
      
       To reach this page from the index page, we modify one line in views/index.ejs.  Instead of &lt;li&gt;Cerebrum&lt;/li&gt; we put:
 
-      <pre><code>
+      <pre><code class="language-markup">
         &lt;li&gt;&lt;a href="/part"&gt;Cerebrum&lt;/a&gt;&lt;/li&gt;
         </code></pre>
         
@@ -160,7 +162,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
 <div id="S3" class='steps'>
      <h3 class="num"> 3. Data in controller </h3> In this section we move the data to the controller file.  Replace the two existing functions in controllers/brain.js with the following code:
        
-           <pre><code>
+           <pre><code class="language-javascript">
     module.exports.getParts = function(req, res){
       res.render('index', {
         title: 'Parts of the Human Brain',
@@ -817,350 +819,324 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
      <h3 class="num"> 9. Updating single subdocuments. </h3>In the first part of this section we learn how to update the meaning of a  brain part in Postman. The updated meaning will be stored in Mongo database. The route definition in routes/indexApi.js is defined with the method PUT. 
           
         <pre><code>
-        router.put('/brainparts/:brainpartid', brainparts.updateMeaning);
+      router.put('/brainparts/:brainpartid', brainparts.updateMeaning);
       </code></pre>
            The API function updateMeaning  is in controllers/brainApi.js.  
           <pre><code>
-          module.exports.updateMeaning = function(req, res){
-    if(!req.params.brainpartid){
-        res.status(404);
-        res.json({"message": "id not found, it is required"});    
-        return;
-    }
-    Brain.findById(req.params.brainpartid)
-       .select('-name')
-       .exec(
-        function(err, part){
+      module.exports.updateMeaning = function(req, res){
+        if(!req.params.brainpartid){
+          res.status(404);
+          res.json({"message": "id not found, it is required"});    
+          return;
+        }
+        Brain.findById(req.params.brainpartid)
+        .select('-name')
+        .exec(
+          function(err, part){
             if(!part){
-                res.status(404);
-                res.json({"message":"brain part is not found"});
-                return;
+              res.status(404);
+              res.json({"message":"brain part is not found"});
+              return;
             } else if (err) {
-                res.status(400);
-                res.json(err);
-                return;
+              res.status(400);
+              res.json(err);
+              return;
             }
             if (req.body.meaning)  part.meaning = req.body.meaning;
-            
             part.save(function(err, part){
-                if (err){
-                    res.status(404);
-                    res.json(err);
-                } else {
-                    res.status(200);
-                    res.json(part);
-                }   
+              if (err){
+                res.status(404);
+                res.json(err);
+              } else {
+                res.status(200);
+                res.json(part);
+              }   
+            });
         });
-  });
-}
+      }
 
       </code></pre>
           Now we can test the updateMeaning function in Postman to set or update a meaning. The URL is http://localhost:3000/api/brainparts/id and choose method PUT. Before pushing the Save button, a new meaning has to be given in JSON format. In Postman choose Body, raw and JSON(application/json). Copy the following definition in the textarea in Postman. Now send the request. And we have the updated meaning in our database.
           <pre><code>
-        {"meaning":"thinking"}
+      {"meaning":"thinking"}
       </code></pre>
           In the second part we will update the meaning in the browser and use our API updateMeaning function to save the updated meaning in the database. We will need a form first and a route has to be determined with a GET request. In routes/index.js copy:
           <pre><code>
-          router.get('/updatemeaning/:brainpartid', brainController.formUpdateMeaning);
+      router.get('/updatemeaning/:brainpartid', brainController.formUpdateMeaning);
       </code></pre>
           The corresponding formUpdateMeaning function in controllers/brain.js is shown as:
           <pre><code>
-          module.exports.formUpdateMeaning = function(req, res){
-    
-    var requestOps, path;
-    path = "/api/brainparts/" + req.params.brainpartid;
-    
-    requestOps = {
-        url: apiOps.server + path,
-        method: "GET",
-        json: {}
-    };
-    request(requestOps, 
-           function(err, response, body){
+      module.exports.formUpdateMeaning = function(req, res){
+        var requestOps, path;
+        path = "/api/brainparts/" + req.params.brainpartid;
+        requestOps = {
+          url: apiOps.server + path,
+          method: "GET",
+          json: {}
+        };
+        request(requestOps, 
+          function(err, response, body){
             res.render('updatemeaning', {
             title: 'Update Meaning',
             error: req.query.err,
             brainpart: body,
             part:{
-                name: body.name,
-                meaning: body.meaning
+              name: body.name,
+              meaning: body.meaning
             }
-      });
-       
-    });
-    
-};
+          });
+        });
+      };
   </code></pre>
           We need to create a file named updatemeaning.ejs in the views folder. 
           <pre><code>
-&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-  &lt;head&gt;
-      &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
-    &lt;title&gt;&lt;%= title %&gt;&lt;/title&gt;
-    &lt;link rel='stylesheet' href='/stylesheets/style.css' /&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;h1&gt; Update meaning for &lt;%= part.name %&gt;&lt;/h1&gt; 
-      &lt;form class="form-horizontal" action="" method="post" role="form"&gt;
-          &lt;p&gt; Field is requiered! &lt;/p&gt;
-          &lt;table&gt;
-        &lt;tr&gt;
-        &lt;td&gt;Meaning&lt;/td&gt;
-        &lt;td>&lt;input type="text" name="formmeaning"  value="&lt;%= part.meaning %&gt;"&gt;&lt;/td&gt;
-        &lt;/tr>&gt;        
-        &lt;tr&gt;
-        &lt;td colspan="2"&gt;&lt;input type="submit" value="Save" &gt;&lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;/table&gt;
+      &lt;!DOCTYPE html&gt;
+      &lt;html&gt;
+        &lt;head&gt;
+          &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+          &lt;title&gt;&lt;%= title %&gt;&lt;/title&gt;
+          &lt;link rel='stylesheet' href='/stylesheets/style.css' /&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+          &lt;h1&gt; Update meaning for &lt;%= part.name %&gt;&lt;/h1&gt; 
+          &lt;form class="form-horizontal" action="" method="post" role="form"&gt;
+            &lt;p&gt; Field is requiered! &lt;/p&gt;
+            &lt;table&gt;
+            &lt;tr&gt;
+            &lt;td&gt;Meaning&lt;/td&gt;
+            &lt;td>&lt;input type="text" name="formmeaning"  value="&lt;%= part.meaning %&gt;"&gt;&lt;/td&gt;
+            &lt;/tr>&gt;        
+            &lt;tr&gt;
+            &lt;td colspan="2"&gt;&lt;input type="submit" value="Save" &gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;/table&gt;
           &lt;/form&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
+        &lt;/body&gt;
+      &lt;/html&gt;
  </code></pre>
           We also need to add a link in views/index.ejs. 
           <pre><code>
-          &lt;a href='/updatemeaning/&lt;%= brainpart._id %&gt;' class="changepart"&gt; Update meaning. &lt;/a&gt;
+      &lt;a href='/updatemeaning/&lt;%= brainpart._id %&gt;' class="changepart"&gt; Update meaning. &lt;/a&gt;
       </code></pre>
           Now the updated meaning has to be sent with a POST request. In routes/index.js put the route method: 
           <pre><code>
-          router.post('/updatemeaning/:brainpartid', brainController.updateMeaning);
+      router.post('/updatemeaning/:brainpartid', brainController.updateMeaning);
       </code></pre>
           Finally we create the updateMeaning function. If the update is succesful, the application will be redirected to '/part/id'. If the name field left empty the form is shown again.
            <pre><code>
-           module.exports.updateMeaning = function(req, res){
-    
-    var requestOps, path, partid, postdata;
-    partid = req.params.brainpartid;
-
-  path = "/api/brainparts/" + req.params.brainpartid;
-  
-  postdata = {
-      meaning: req.body.formmeaning
-  };
-    
-    requestOps = {
-    url : apiOps.server + path,
-    method : "PUT",
-    json : postdata
-  };
-    if (!postdata.meaning) {
-    res.redirect('/updatemeaning/'+partid);
-  }
-    else {
-    request(
-      requestOps,
-      function(err, response, body) {
-        if (response.statusCode === 200) {
-          res.redirect('/part/'+partid);
-        } else if (response.statusCode === 400 && body.formmeaning && body.formmeaning === "ValidationError" ) {
+      module.exports.updateMeaning = function(req, res){
+        var requestOps, path, partid, postdata;
+        partid = req.params.brainpartid;
+        path = "/api/brainparts/" + req.params.brainpartid;
+        postdata = {
+          meaning: req.body.formmeaning
+        };
+        requestOps = {
+          url : apiOps.server + path,
+          method : "PUT",
+          json : postdata
+        };
+        if (!postdata.meaning) {
           res.redirect('/updatemeaning/'+partid);
-        } else {
-        res.status(response.statusCode);
-        res.render('error', {
-           message: "field is empty",
-               partid: partid,
-                error: {
-                    status: response.statusCode,
-                    stack: 'go back to brainpart'
-                }
-  });
         }
+        else {
+          request( requestOps, function(err, response, body) {
+            if (response.statusCode === 200) {
+              res.redirect('/part/'+partid);
+            } else if (response.statusCode === 400 && body.formmeaning && body.formmeaning === "ValidationError" ) {
+              res.redirect('/updatemeaning/'+partid);
+            } else {
+              res.status(response.statusCode);
+              res.render('error', {
+                message: "field is empty",
+                partid: partid,
+                error: {
+                  status: response.statusCode,
+                  stack: 'go back to brainpart'
+                }
+              });
+            }//else
+          });
+        } //else 
       }
-    );
-  } //else 
-      
-}
 </code></pre>
           Step 9 is finished.
           <pre><code>
-          git checkout -f step9
+      git checkout -f step9
           </code></pre>
       </div>
       
       <div id="S10" class='steps'>
      <h3 class="num"> 10. Updating list subdocuments. </h3>In the first part of this section we learn how to update the funtionalities of a brain part in Postman. The updated functionalities will be stored in Mongo database. The route definition in routes/indexApi.js is given with the method PUT.
           <pre><code>
-          router.put('/brainparts/:brainpartid/functionalities', brainparts.updateFunctionalities);
+      router.put('/brainparts/:brainpartid/functionalities', brainparts.updateFunctionalities);
       </code></pre>
           The API function updateFunctionalities is in controllers/brainApi.js.
           <pre><code>
-          module.exports.updateFunctionalities = function(req, res){
-
-    if(!req.params.brainpartid){
-        res.status(404);
-        res.json({"message": "id not found, it is required"});    
-        return;
-    }
-    Brain.findById(req.params.brainpartid)
-       .select('-name')
-       .exec(
-        function(err, part){
+      module.exports.updateFunctionalities = function(req, res){
+        if(!req.params.brainpartid){
+          res.status(404);
+          res.json({"message": "id not found, it is required"});    
+          return;
+        }
+        Brain.findById(req.params.brainpartid)
+        .select('-name')
+        .exec(
+          function(err, part){
             if(!part){
-                res.status(404);
-                res.json({"message":"brain part is not found"});
-                return;
+              res.status(404);
+              res.json({"message":"brain part is not found"});
+              return;
             } else if (err) {
-                res.status(400);
-                res.json(err);
-                return;
+              res.status(400);
+              res.json(err);
+              return;
             }
             part.functionalities = [];
             part.functionalities = part.functionalities.concat(req.body.functionalities);
-            
             part.save(function(err,  part){
-                if (err){
-                    res.status(404);
-                    res.json(err);
-                } else {
-                    res.status(200);
-                    res.json(part);
-                }   
-        });
-  });
-}
+              if (err){
+                res.status(404);
+                res.json(err);
+              } else {
+                res.status(200);
+                res.json(part);
+              }   
+            });
+          });
+      }
       </code></pre>Now we can test the updateFuncionalities function in Postman to set or update a functionality list. The URL is http://localhost:3000/api/brainparts/id/functionalities and choose method PUT. Before pushing the Save button, a new functinality list has to be given in JSON format. In Postman choose Body, raw and JSON(application/json). Copy the following definition in the textarea in Postman. Now send the request. And we have the updated funcionality list in our database.
           <pre><code>
-          {"functionalities": [ {"functionality":"Posture"}, {"functionalities":"Balance"}]}
+      {"functionalities": [ {"functionality":"Posture"}, {"functionalities":"Balance"}]}
       </code></pre>
           In the second part we will update the functionality list in the browser and use our API updateFunctionalities function to save the updated functionality list in the database. We define a form first and a route has to be determined with a GET request. In routes/index.js copy:
      <pre><code>
-        router.get('/updatefunctionalities/:brainpartid', brainController.formUpdateFunctionalities);
+      router.get('/updatefunctionalities/:brainpartid', brainController.formUpdateFunctionalities);
            </code></pre>
           The formUpdateMeaning function in controllers/brain.js is given as:
           <pre><code>
-          module.exports.formUpdateFunctionalities = function(req, res){
-    
-    var requestOps, path;
-    path = "/api/brainparts/" + req.params.brainpartid;
-    
-    requestOps = {
-        url: apiOps.server + path,
-        method: "GET",
-        json: {}
-    };
-    request(requestOps, 
-           function(err, response, body){
-                var funclist = "";
-                var l = body.functionalities.length;
-                var i;
-                if (l &gt; 0){
-                for (i = 0; i &lt; l-1; i++){
-                    funclist += body.functionalities[i].functionality + ', '
-                }
-                funclist += body.functionalities[l-1].functionality;
-                }
-                res.render('updatefunctionalities', {
-            title: 'Update functionalities',
-            error: req.query.err,
-            brainpart: body,
-            part:{
+      module.exports.formUpdateFunctionalities = function(req, res){
+        var requestOps, path;
+        path = "/api/brainparts/" + req.params.brainpartid;
+        requestOps = {
+          url: apiOps.server + path,
+          method: "GET",
+          json: {}
+        };
+        request(requestOps, 
+          function(err, response, body){
+            var funclist = "";
+            var l = body.functionalities.length;
+            var i;
+            if (l &gt; 0){
+              for (i = 0; i &lt; l-1; i++){
+                funclist += body.functionalities[i].functionality + ', '
+              }
+              funclist += body.functionalities[l-1].functionality;
+            }
+            res.render('updatefunctionalities', {
+              title: 'Update functionalities',
+              error: req.query.err,
+              brainpart: body,
+              part:{
                 name: body.name,
                 meaning: body.meaning,
                 functionalities: funclist
-            }
-      });
-    });
-};
+              }
+            });
+          });
+      };
 
           </code></pre>
 We need to create a file named updatefunctionalities.ejs in the views folder.
           <pre><code>
-          &lt;!DOCTYPE html&gt;
-&lt;html&gt;
-  &lt;head&gt;
-      &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
-    &lt;title&gt;&lt;%= title %&gt;&lt;/title&gt;
-      &lt;link rel='stylesheet' href='/stylesheets/style.css' /&gt;
-  &lt;/head&gt;
-  &lt;body&gt;
-    &lt;h1&gt; Replace Functionalities for &lt;%= part.name %&gt;&lt;/h1&gt; 
-      
-      &lt;form class="form-horizontal" action="" method="post" role="form"&gt;
-          
-          &lt;p&gt; Please separate functionalities with commas.  &lt;/p&gt;
-          &lt;table&gt;
-                        
-        &lt;tr&gt;
-        &lt;td&gt;Functionality&lt;/td&gt;
-        &lt;td&gt;
+      &lt;!DOCTYPE html&gt;
+      &lt;html&gt;
+        &lt;head&gt;
+          &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+          &lt;title&gt;&lt;%= title %&gt;&lt;/title&gt;
+          &lt;link rel='stylesheet' href='/stylesheets/style.css' /&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+          &lt;h1&gt; Replace Functionalities for &lt;%= part.name %&gt;&lt;/h1&gt; 
+          &lt;form class="form-horizontal" action="" method="post" role="form"&gt;
+            &lt;p&gt; Please separate functionalities with commas.  &lt;/p&gt;
+            &lt;table&gt;
+            &lt;tr&gt;
+            &lt;td&gt;Functionality&lt;/td&gt;
+            &lt;td&gt;
             &lt;input type="text" name="formfunc" value="&lt;%= part.functionalities %&gt;"&gt;
-        &lt;/td&gt;
-        &lt;/tr&gt;
-        &lt;tr&gt;
-        &lt;td colspan="2"&gt;&lt;input type="submit" value="Save" &gt;&lt;/td&gt;
-        &lt;/tr&gt;
-    &lt;/table&gt;
+            &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+            &lt;td colspan="2"&gt;&lt;input type="submit" value="Save" &gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;/table&gt;
           &lt;/form&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
-
+        &lt;/body&gt;
+      &lt;/html&gt;
           </code></pre>
           We also need to add a link in views/index.ejs.
         <pre><code>
-        &lt;a href='/updatefunctionalities/&lt;%= brainpart._id %&gt;' class="changepart"&gt; Update functionalities &lt;/a&gt;
+      &lt;a href='/updatefunctionalities/&lt;%= brainpart._id %&gt;' class="changepart"&gt; Update functionalities &lt;/a&gt;
         </code></pre>
           Now the updated functionality list has to be sent with a POST request. In routes/index.js put the route method:
           <pre><code>
-          router.post('/updatefunctionalities/:brainpartid', brainController.updateFunctionalities);
+      router.post('/updatefunctionalities/:brainpartid', brainController.updateFunctionalities);
         </code></pre>
           Finally we create the updateFunctionalities function. If the update is succesful, the application will be redirected to '/part/id'. If the name field left empty the form is shown again.
           <pre><code>
-          module.exports.updateFunctionalities = function(req, res){
-    
-    var requestOps, path, partid, postdata;
-    partid = req.params.brainpartid;
-  path = "/api/brainparts/" + req.params.brainpartid + "/functionalities";
-  var funclist = req.body.formfunc.split(",");
-    
-    var funcdict = [];
-    if(funclist[0]!== "") {
-        var l = funclist.length;
-        var i;
-        for (i = 0; i %lt;l; i++){
+      module.exports.updateFunctionalities = function(req, res){
+        var requestOps, path, partid, postdata;
+        partid = req.params.brainpartid;
+        path = "/api/brainparts/" + req.params.brainpartid + "/functionalities";
+        var funclist = req.body.formfunc.split(",");
+        var funcdict = [];
+        if(funclist[0]!== "") {
+          var l = funclist.length;
+          var i;
+          for (i = 0; i %lt;l; i++){
             funcdict.push({
-                "functionality": funclist[i]
+              "functionality": funclist[i]
             });
+          }
         }
-    }
-    postdata = {
-      functionalities: funcdict
-  };
-    requestOps = {
-    url : apiOps.server + path,
-    method: "PUT",
-    json : postdata
-  };
-    if (!postdata.functionalities) {
-    res.redirect('/updatefunctionalities/'+partid);
-  }
-    else {
-    request(
-      requestOps,
-      function(err, response, body) {
-        if (response.statusCode === 200) {
-          res.redirect('/part/'+partid);
-        } else if (response.statusCode === 400 && body.formfunctionalities && body.formfunctionalities === "ValidationError" ) {
-          res.redirect('/updatefunctionalities/' + partid);
-        } else {
-        res.status(response.statusCode);
-        res.render('error', {
-           message: "field is empty",
-               movieid: partid,
+        postdata = {
+          functionalities: funcdict
+        };
+        requestOps = {
+          url : apiOps.server + path,
+          method: "PUT",
+          json : postdata
+        };
+        if (!postdata.functionalities) {
+          res.redirect('/updatefunctionalities/'+partid);
+        }
+        else {
+          request( requestOps, function(err, response, body) {
+            if (response.statusCode === 200) {
+              res.redirect('/part/'+partid);
+            } else if (response.statusCode === 400 && body.formfunctionalities && body.formfunctionalities === "ValidationError" ) {
+              res.redirect('/updatefunctionalities/' + partid);
+            } else {
+              res.status(response.statusCode);
+              res.render('error', {
+                message: "field is empty",
+                movieid: partid,
                 error: {
-                    status: response.statusCode,
-                    stack: 'go back to brain part'
+                  status: response.statusCode,
+                  stack: 'go back to brain part'
                 }
-            });
-        }
+              });
+            }
+          }
+         );
+        } //else 
       }
-    );
-  } //else 
-    
-}
 </code></pre>
           We are done with this step. You can check it out now.
    <pre><code>
-   git checkout -f step10
+      git checkout -f step10
     </code></pre>          
       </div>  
   </body>
