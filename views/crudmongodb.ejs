@@ -1013,7 +1013,7 @@ To start let's do a few initial steps. First we make a new directory 'brain' and
      <pre><code>
       router.get('/updatefunctionalities/:brainpartid', brainController.formUpdateFunctionalities);
            </code></pre>
-          The formUpdateMeaning function in controllers/brain.js is given as:
+          The formUpdateFunctionalities function in controllers/brain.js is given as:
           <pre><code>
       module.exports.formUpdateFunctionalities = function(req, res){
         var requestOps, path;
@@ -1076,7 +1076,7 @@ We need to create a file named updatefunctionalities.ejs in the views folder.
         &lt;/body&gt;
       &lt;/html&gt;
           </code></pre>
-          We also need to add a link in views/index.ejs.
+          We also need to add a link in views/part.ejs.
         <pre><code>
       &lt;a href='/updatefunctionalities/&lt;%= brainpart._id %&gt;' class="changepart"&gt; Update functionalities &lt;/a&gt;
         </code></pre>
@@ -1095,7 +1095,7 @@ We need to create a file named updatefunctionalities.ejs in the views folder.
         if(funclist[0]!== "") {
           var l = funclist.length;
           var i;
-          for (i = 0; i %lt;l; i++){
+          for (i = 0; i &lt;l; i++){
             funcdict.push({
               "functionality": funclist[i]
             });
@@ -1122,7 +1122,7 @@ We need to create a file named updatefunctionalities.ejs in the views folder.
               res.status(response.statusCode);
               res.render('error', {
                 message: "field is empty",
-                movieid: partid,
+                partid: partid,
                 error: {
                   status: response.statusCode,
                   stack: 'go back to brain part'
